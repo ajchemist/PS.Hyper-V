@@ -1,0 +1,46 @@
+name: Main CI
+
+
+on:
+  push:
+    branches: [ master ]
+    # branches-ignore:
+    #   - '**'
+  pull_request:
+    branches: [ master ]
+
+
+env:
+  module: io.github.ajchemist.PS.Hyper-V
+
+
+jobs:
+  publish:
+    if: "!(contains(github.event.head_commit.message, 'ci skip') || contains(github.event.head_commit.message, 'skip ci'))"
+    env:
+      MODULE_MANIFEST_FILE: io.github.ajchemist.PS.Hyper-V/io.github.ajchemist.PS.Hyper-V.psd1
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+
+
+      - name: Setup
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module io.github.ajchemist.PS.Utils -ErrorAction Stop
+          Update-ModuleManifest $env:MODULE_MANIFEST_FILE -ModuleVersion $(Get-ChronoVersionString)
+
+
+      - name: Publishing
+        run: |
+          Publish-Module -Path '${{ env.module }}' -NuGetApiKey ${{ secrets.PS_GALLERY_KEY }}
+
+
+      - name: Push a commit using the built-in token
+        run: |
+          git config --local user.name "ajchemist"
+          git config --local user.email "1694505+ajchemist@users.noreply.github.com"
+          git add -u
+          git commit -m $(-Join($(Import-PowerShellDataFile $env:MODULE_MANIFEST_FILE).ModuleVersion, " [ci skip]"))
+          git remote -v
+          git push

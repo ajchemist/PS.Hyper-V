@@ -1,0 +1,43 @@
+name: Lint CI
+
+
+on:
+  push:
+    branches: [ master ]
+    # branches-ignore:
+    #   - '**'
+  pull_request:
+    branches: [ master ]
+
+
+env:
+  module: io.github.ajchemist.PS.Hyper-V
+
+
+jobs:
+  lint:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+
+
+      - name: Install PSScriptAnalyzer module
+        if: success()
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -ErrorAction Stop
+
+
+      - name: Lint with PSScriptAnalyzer
+        if: success()
+        shell: pwsh
+        run: |
+          Invoke-ScriptAnalyzer -Path .\${{ env.module }} -Recurse -Outvariable issues -ExcludeRule PSAvoidUsingWriteHost,PSUseShouldProcessForStateChangingFunctions
+          $errors   = $issues.Where({$_.Severity -eq 'Error'})
+          $warnings = $issues.Where({$_.Severity -eq 'Warning'})
+          if ($errors) {
+          Write-Error "There were $($errors.Count) errors and $($warnings.Count) warnings total." -ErrorAction Stop
+          } else {
+          Write-Output "There were $($errors.Count) errors and $($warnings.Count) warnings total."
+          }
