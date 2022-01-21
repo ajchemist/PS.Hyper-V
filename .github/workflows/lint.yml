@@ -3,11 +3,17 @@ name: Lint CI
 
 on:
   push:
-    branches: [ master ]
+    paths:
+      - '**.ps1'
+      - '**.psm1'
+      - '**.psd1'
+    branches:
+      - master
     # branches-ignore:
     #   - '**'
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
 
 
 env:
@@ -19,6 +25,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
 
       - name: Install PSScriptAnalyzer module
