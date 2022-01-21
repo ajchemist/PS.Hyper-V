@@ -191,6 +191,7 @@ function New-LinuxVMFromZeroboot
             VM = $VM
             BootOrder = @((Get-VMHardDiskDrive $VM)[0], (Get-VMNetworkAdapter $VM)[0])
             EnableSecureBoot = 1
+            SecureBootTemplate = "MicrosoftUEFICertificateAuthority"
         }
         Set-VMFirmware @VMFirmwareParam
 
