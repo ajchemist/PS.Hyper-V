@@ -85,7 +85,11 @@ function New-WindowsVMFromZeroboot
 
         [string]
         [ValidateNotNullOrEmpty()]
-        $VMName = ($(if (!([string]::IsNullOrEmpty($templateName))) { "${templateName}-"}) + (Get-ChronoVersionString))
+        $VMName = ($(if (!([string]::IsNullOrEmpty($templateName))) { "${templateName}-" }) + (Get-ChronoVersionString))
+
+        [parameter(Mandatory = $False)]
+        [Switch]
+        $PassThru
     )
 
 
@@ -122,6 +126,7 @@ function New-WindowsVMFromZeroboot
             BootOrder = @((Get-VMHardDiskDrive $VM)[0], (Get-VMNetworkAdapter $VM)[0])
         }
         Set-VMFirmware @VMFirmwareParam
+        Enable-VMTPM -VM $VM # Windows 11
 
 
         # Get-VMIntegrationService -VM $VM -Name "Guest Service Interface" | Enable-VMIntegrationService
@@ -134,4 +139,93 @@ function New-WindowsVMFromZeroboot
     {
         Write-Error $_.Exception.Message
     }
+}
+
+
+function New-LinuxVMFromZeroboot
+{
+    [CmdletBinding()]
+    Param
+    (
+        [System.IO.FileInfo]
+        [parameter(Mandatory = $true)]
+        [ValidateScript(
+             {
+                 if( -Not ($_ | Test-Path) )
+                 {
+                     throw "File or folder does not exist: $_"
+                 }
+                 return $true
+             })]
+        $ParentPath,
+
+        [string]
+        [parameter(Mandatory = $true)]
+        $VMName
+    )
+
+
+    try
+    {
+        $SystemVHDPath = (Join-Path $VirtualDrivePath "${VMName}-system.vhdx")
+        $SystemVHD = New-VHD -Differencing -ParentPath $ParentPath -Path $SystemVHDPath
+
+
+        $NewVMParam = @{
+            Name = $VMName
+            Generation = 2
+            SwitchName = (Get-VMSwitch -SwitchType External)[0].Name
+        }
+        $VM = New-VM @NewVMParam
+
+
+        $vmScsiController0 = $VM | Get-VMScsiController -ControllerNumber 0
+        $vmScsiController0 | Add-VMHardDiskDrive -Path $SystemVHDPath
+
+
+        # default configuration
+        $VM | Set-VMProcessor -count 2 -maximum 98
+
+
+        $VMFirmwareParam = @{
+            VM = $VM
+            BootOrder = @((Get-VMHardDiskDrive $VM)[0], (Get-VMNetworkAdapter $VM)[0])
+            EnableSecureBoot = 1
+        }
+        Set-VMFirmware @VMFirmwareParam
+
+
+        # Get-VMIntegrationService -VM $VM -Name "Guest Service Interface" | Enable-VMIntegrationService
+        $VM | Get-VMIntegrationService | Where-Object {$_.Enabled -eq $false } | ForEach-Object -Process { Enable-VMIntegrationService $_ }
+
+
+        return $VM
+    }
+    catch
+    {
+        Write-Error $_.Exception.Message
+    }
+}
+
+
+function New-Ubuntu2004VMFromZeroboot
+{
+    Param
+    (
+        [System.IO.FileInfo]
+        [parameter(Mandatory = $true)]
+        $ParentPath,
+
+        [string]
+        $templateName = "ubuntu2004"
+
+        [string]
+        [ValidateNotNullOrEmpty()]
+        $VMName = ($(if (!([string]::IsNullOrEmpty($templateName))) { "${templateName}-" }) + (Get-ChronoVersionString))
+
+        [Switch]
+        [parameter(Mandatory = $False)]
+        $PassThru
+    )
+    return New-LinuxVMFromZeroboot -ParentPath $ParentPath -VMName $VMName
 }
