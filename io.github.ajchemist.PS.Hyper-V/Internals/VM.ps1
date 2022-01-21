@@ -87,8 +87,8 @@ function New-WindowsVMFromZeroboot
         [ValidateNotNullOrEmpty()]
         $VMName = ($(if (!([string]::IsNullOrEmpty($templateName))) { "${templateName}-" }) + (Get-ChronoVersionString))
 
-        [parameter(Mandatory = $False)]
         [Switch]
+        [parameter(Mandatory = $false)]
         $PassThru
     )
 
