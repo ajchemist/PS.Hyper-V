@@ -85,7 +85,7 @@ function New-WindowsVMFromZeroboot
 
         [string]
         [ValidateNotNullOrEmpty()]
-        $VMName = ($(if (!([string]::IsNullOrEmpty($templateName))) { "${templateName}-" }) + (Get-ChronoVersionString))
+        $VMName = ($(if (!([string]::IsNullOrEmpty($templateName))) { "${templateName}-" }) + (Get-ChronoVersionString)),
 
         [Switch]
         [parameter(Mandatory = $false)]
@@ -217,11 +217,11 @@ function New-Ubuntu2004VMFromZeroboot
         $ParentPath,
 
         [string]
-        $templateName = "ubuntu2004"
+        $templateName = "ubuntu2004",
 
         [string]
         [ValidateNotNullOrEmpty()]
-        $VMName = ($(if (!([string]::IsNullOrEmpty($templateName))) { "${templateName}-" }) + (Get-ChronoVersionString))
+        $VMName = ($(if (!([string]::IsNullOrEmpty($templateName))) { "${templateName}-" }) + (Get-ChronoVersionString)),
 
         [Switch]
         [parameter(Mandatory = $False)]

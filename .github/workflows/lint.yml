@@ -30,7 +30,6 @@ jobs:
 
 
       - name: Install PSScriptAnalyzer module
-        if: success()
         shell: pwsh
         run: |
           Set-PSRepository PSGallery -InstallationPolicy Trusted
@@ -38,11 +37,10 @@ jobs:
 
 
       - name: Lint with PSScriptAnalyzer
-        if: success()
         shell: pwsh
         run: |
           Invoke-ScriptAnalyzer -Path .\${{ env.module }} -Recurse -Outvariable issues -ExcludeRule PSAvoidUsingWriteHost,PSUseShouldProcessForStateChangingFunctions
-          $errors   = $issues.Where({$_.Severity -eq 'Error'})
+          $errors = $issues.Where({$_.Severity -eq 'Error'})
           $warnings = $issues.Where({$_.Severity -eq 'Warning'})
           if ($errors) {
           Write-Error "There were $($errors.Count) errors and $($warnings.Count) warnings total." -ErrorAction Stop
