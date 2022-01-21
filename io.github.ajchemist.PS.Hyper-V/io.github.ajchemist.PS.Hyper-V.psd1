@@ -12,7 +12,7 @@
 RootModule = 'io.github.ajchemist.PS.Hyper-V.psm1'
 
 # Version number of this module.
-ModuleVersion = '2022.21.11758'
+ModuleVersion = '2022.21.12429'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
