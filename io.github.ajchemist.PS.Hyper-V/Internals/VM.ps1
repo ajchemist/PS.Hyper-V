@@ -126,7 +126,6 @@ function New-WindowsVMFromZeroboot
             BootOrder = @((Get-VMHardDiskDrive $VM)[0], (Get-VMNetworkAdapter $VM)[0])
         }
         Set-VMFirmware @VMFirmwareParam
-        Enable-VMTPM -VM $VM # Windows 11
 
 
         # Get-VMIntegrationService -VM $VM -Name "Guest Service Interface" | Enable-VMIntegrationService
