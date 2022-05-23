@@ -119,3 +119,41 @@ function New-VHDForWindowsVMDataVolume
 
     return $VHD
 }
+
+
+function New-VHDForDataVolume
+{
+    #Requires -RunAsAdministrator
+    #Requires -Modules Hyper-V
+    [CmdletBinding()]
+    param
+    (
+        [UInt64]
+        [ValidateNotNullOrEmpty()]
+        [ValidateRange(16GB, 64TB)]
+        $SizeBytes = 255GB,
+
+        [UInt64]
+        [ValidateNotNullOrEmpty()]
+        $BlockSizeBytes = 1MB,
+
+        [string]
+        [ValidateNotNullOrEmpty()]
+        $vhdName = ([guid]::NewGuid().toString() + ".vhdx"),
+
+        [string]
+        [ValidateNotNullOrEmpty()]
+        $vhdPath = (Join-Path $VirtualDrivePath $vhdName)
+    )
+
+
+    $NewVHDParam = @{
+        Path = $vhdPath
+        SizeBytes = $SizeBytes
+        BlockSizeBytes = $BlockSizeBytes
+    }
+    $VHD = New-VHD @NewVHDParam
+
+
+    return $VHD
+}

@@ -69,9 +69,10 @@ RequiredModules = @(@{ModuleName = 'io.github.ajchemist.PS.Utils'; ModuleVersion
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = 'New-VHDForWindowsVMSystemVolume', 'New-VHDForWindowsVMDataVolume', 
-               'New-WindowsZerobootVirtualDisk', 'New-WindowsVMFromZeroboot', 
-               'New-LinuxVMFromZeroboot', 'New-Ubuntu2004VMFromZeroboot'
+FunctionsToExport = 'New-VHDForWindowsVMSystemVolume', 'New-VHDForWindowsVMDataVolume',
+    'New-VHDForDataVolume',
+    'New-WindowsZerobootVirtualDisk', 'New-WindowsVMFromZeroboot',
+    'New-LinuxVMFromZeroboot', 'New-Ubuntu2004VMFromZeroboot'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = '*'
@@ -131,4 +132,3 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
-
